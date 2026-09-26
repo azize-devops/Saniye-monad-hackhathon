@@ -170,6 +170,30 @@ h2 { margin: 4px 0; font-size: 26px; letter-spacing: -0.02em; }
 .summary .sum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .summary .sum-grid p { margin: 0; }
 
+/* ---------- landing ---------- */
+#view-landing { padding-top: 24px; display: grid; gap: 28px; }
+#view-landing[hidden] { display: none; }
+.film-frame { position: relative; width: 100%; aspect-ratio: 16 / 9; max-width: 100%; border-radius: var(--radius); overflow: hidden; border: 1px solid var(--line); background: var(--bg); box-shadow: 0 40px 90px -40px rgba(131,110,249,.55); }
+.film-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+.landing-cta { display: grid; gap: 22px; }
+.landing-copy h1 { font-size: clamp(30px, 4.4vw, 52px); }
+.landing-copy .lede { margin-top: 10px; }
+.cta-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 14px; }
+.cta-card {
+  display: grid; gap: 6px; align-content: start; text-align: left; cursor: pointer;
+  padding: 20px 22px; border-radius: var(--radius); border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink); font: inherit; transition: transform .12s, border-color .2s, background .2s;
+}
+.cta-card:hover { text-decoration: none; border-color: var(--purple); transform: translateY(-2px); }
+.cta-card:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+.cta-card.primary { background: var(--lime); border-color: var(--lime); color: #111; }
+.cta-card.primary .cta-k, .cta-card.primary .cta-d { color: #2b2f12; }
+.cta-k { font: 500 12px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.cta-t { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.cta-d { font-size: 14px; color: var(--muted); line-height: 1.4; }
+.landing-facts { display: flex; flex-wrap: wrap; gap: 10px 26px; color: var(--muted); font-size: 14px; }
+.landing-facts b { color: var(--lime); font-weight: 600; }
+
 /* ---------- in-app scanner ---------- */
 .scan-btn { width: 100%; margin-top: 10px; padding: 14px; font-size: 16px; }
 .scan-btn .muted { font-weight: 400; font-size: 14px; }
@@ -212,6 +236,7 @@ h2 { margin: 4px 0; font-size: 26px; letter-spacing: -0.02em; }
 
 @media (max-width: 860px) {
   .grid, .kpis { grid-template-columns: 1fr; }
+  .cta-grid { grid-template-columns: 1fr; }
   .qr-card { grid-template-columns: 1fr; justify-items: center; text-align: center; }
   .qr-card .qr-box { width: 220px; }
   .qr-card .row { justify-content: center; }

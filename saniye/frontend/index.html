@@ -13,11 +13,12 @@
 </head>
 <body>
   <header class="topbar">
-    <a class="brand" href="#kullanici">
+    <a class="brand" href="#tanitim">
       <span class="brand-mark" aria-hidden="true"></span>
       <span class="brand-name">saniye<span class="dot">.</span></span>
     </a>
     <nav class="tabs" role="tablist">
+      <a href="#tanitim" class="tab" data-tab="landing">Tanıtım</a>
       <a href="#kullanici" class="tab" data-tab="user">Kullanıcı</a>
       <a href="#isletme" class="tab" data-tab="biz">İşletme</a>
     </nav>
@@ -47,6 +48,38 @@
   </div>
 
   <main>
+    <!-- ============ LANDING ============ -->
+    <section id="view-landing" class="view" hidden>
+      <div class="film-frame">
+        <iframe id="introFrame" title="Saniye tanıtım filmi" loading="eager"></iframe>
+      </div>
+      <div class="landing-cta">
+        <div class="landing-copy">
+          <h1>Kullandığın <em>saniye</em> kadar öde.</h1>
+          <p class="lede">Otopark, scooter, oyun kafe, EV şarj. Girişte QR'ı okut, çıkışta okut: sadece kullandığın saniyeleri ödersin, kalan depozito aynı işlemde geri döner.</p>
+        </div>
+        <div class="cta-grid">
+          <a class="cta-card primary" href="#kullanici" id="ctaTry">
+            <span class="cta-k">Müşteriyim</span>
+            <span class="cta-t">Hemen dene · Ödeme yap</span>
+            <span class="cta-d">Kayıt yok. İlk girişte tarayıcında cüzdanın oluşur.</span>
+          </a>
+          <a class="cta-card" href="#isletme" id="ctaBiz">
+            <span class="cta-k">İşletmeyim</span>
+            <span class="cta-t">Kaydol · Ödeme al</span>
+            <span class="cta-d">Hizmetini zincire kaydet, QR'ını as, gelirini canlı izle.</span>
+          </a>
+          <button class="cta-card" type="button" id="ctaLogin">
+            <span class="cta-k">Zaten kullanıyorum</span>
+            <span class="cta-t">Giriş yap</span>
+            <span class="cta-d">Tarayıcı cüzdanın ya da MetaMask ile devam et.</span>
+          </button>
+        </div>
+        <div class="landing-facts mono">
+          <span><b>0.3 sn</b> blok</span><span><b>0.6 sn</b> kesinlik</span><span><b>%1</b> komisyon</span><span><b>Monad</b> Testnet'te canlı</span>
+        </div>
+      </div>
+    </section>
     <!-- ============ USER VIEW ============ -->
     <section id="view-user" class="view">
       <div class="hero">
@@ -163,7 +196,7 @@
         </article>
       </div>
 
-      <details class="card register">
+      <details class="card register" id="regBox">
         <summary>Kendi hizmetini ekle</summary>
         <form id="regForm" class="reg-form">
           <label>Hizmet adı <input name="name" value="Moda PlayStation Kafe" required maxlength="40" /></label>

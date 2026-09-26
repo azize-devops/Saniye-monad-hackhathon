@@ -592,16 +592,35 @@ async function onRegister(ev) {
 }
 
 // ------------------------------------------------------------------ routing & boot
+// No hash (or #tanitim) shows the landing film. QR links carry #kullanici, so scanners
+// skip the intro and land straight on the payment screen.
+function currentView() {
+  const h = location.hash;
+  if (h === "#isletme") return "biz";
+  if (h === "#kullanici") return "user";
+  if (h === "" && new URLSearchParams(location.search).get("service")) return "user";
+  return "landing";
+}
+
 function route() {
-  const biz = location.hash === "#isletme";
-  $("view-user").hidden = biz;
-  $("view-biz").hidden = !biz;
-  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === (biz ? "biz" : "user")));
-  if (biz) {
+  const view = currentView();
+  $("view-landing").hidden = view !== "landing";
+  $("view-user").hidden = view !== "user";
+  $("view-biz").hidden = view !== "biz";
+  document.querySelectorAll(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === view));
+  // run the film only while the landing is visible
+  const frame = $("introFrame");
+  if (view === "landing") {
+    if (!frame.getAttribute("src")) frame.setAttribute("src", "intro.html?embed=1");
+  } else if (frame.getAttribute("src")) {
+    frame.removeAttribute("src");
+  }
+  if (view === "biz") {
     renderQRs();
     refreshBiz();
     pollEvents();
   }
+  window.scrollTo?.(0, 0);
 }
 
 async function tickBlock() {
@@ -625,6 +644,17 @@ async function boot() {
     else if (!$("kiosk").hidden) closeKiosk();
   });
   $("copyLink").onclick = () => navigator.clipboard.writeText(customerUrl());
+  // landing buttons
+  $("ctaBiz").addEventListener("click", () => {
+    setTimeout(() => {
+      $("regBox").open = true;
+      $("regForm").elements.name?.focus();
+    }, 50);
+  });
+  $("ctaLogin").onclick = () => {
+    location.hash = "#kullanici";
+    $("walletPanel").hidden = false;
+  };
   $("walletBtn").onclick = () => ($("walletPanel").hidden = false);
   $("walletClose").onclick = () => ($("walletPanel").hidden = true);
   $("walletPanel").onclick = (e) => { if (e.target.id === "walletPanel") $("walletPanel").hidden = true; };
