@@ -1,6 +1,6 @@
 <div align="center">
 
-**🌐 [English](./README.md) &nbsp;|&nbsp; [Türkçe](./README.tr.md)**
+**🌐 [English](./README.md) &nbsp;|&nbsp; [Türkçe](./saniye/README.tr.md)**
 
 # ⏱️ saniye.
 
@@ -19,6 +19,8 @@
 **[🔴 Live Demo](https://saniye-monad-hackhathon-dh4x.vercel.app/)** &nbsp;|&nbsp; **[📜 Contract on Monad Testnet](https://testnet.monadvision.com/address/0xBDc9bF66b1d850B555E38F922615a6703014Cce6)**
 
 </div>
+
+> 📁 All code lives in [`saniye/`](./saniye): contract in [`saniye/src`](./saniye/src), tests in [`saniye/test`](./saniye/test), frontend in [`saniye/frontend`](./saniye/frontend).
 
 <br/>
 

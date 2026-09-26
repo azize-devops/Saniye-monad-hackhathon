@@ -14,9 +14,9 @@
 [![Monad Testnet](https://img.shields.io/badge/Monad-Testnet-836EF9?style=for-the-badge&logo=ethereum&logoColor=white)](https://testnet.monadvision.com)
 [![Blitz İstanbul 2026](https://img.shields.io/badge/Monad%20Blitz-İstanbul%202026-1a1a2e?style=for-the-badge)](#)
 [![Solidity](https://img.shields.io/badge/Solidity-Foundry-363636?style=for-the-badge&logo=solidity&logoColor=white)](#testler)
-[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](#)
+[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](./LICENSE)
 
-**[🔴 Canlı Demo](<VERCEL_URL>)** &nbsp;|&nbsp; **[📜 Monad Testnet Kontratı](https://testnet.monadvision.com/address/0xBDc9bF66b1d850B555E38F922615a6703014Cce6)**
+**[🔴 Canlı Demo](https://saniye-monad-hackhathon-dh4x.vercel.app/)** &nbsp;|&nbsp; **[📜 Monad Testnet Kontratı](https://testnet.monadvision.com/address/0xBDc9bF66b1d850B555E38F922615a6703014Cce6)**
 
 </div>
 
@@ -55,6 +55,10 @@ Her hizmetin bir QR kodu — ve bariyer veya sayaç ekranı için tam ekran kios
 
 Uygulama indirmeye gerek yok. Kart yok. Bilet yok.
 
+### 📷 Girişte okut, çıkışta öde
+
+Müşteri uygulamanın içinden de QR okutabilir. **QR okut**'a dokunur, kamerayı girişteki hizmet QR'ına tutar ve oturum başlar. Çıkışta aynı QR'ı tekrar okutur: oturum kapanır, kullanılmayan depozito iade edilir; arada hiçbir butona basmaya gerek yoktur. Başka bir hizmetin QR'ı okutulursa uygulama o hizmete geçer; Saniye'ye ait olmayan kodlar reddedilir.
+
 <br/>
 
 ---
@@ -74,6 +78,17 @@ Bir otopark bariyeri bir blok için 12 saniye, finality için de dakikalarca bek
 - **Ödediğin şey gas limitidir** — Monad'da gönderen, kullanılan gas için değil, `gas_price × gas_limit` üzerinden ücretlendirilir. Arayüz gas'ı tahmin eder ve büyük sabit bir limit yerine sadece %25 pay ekler.
 - **Zincire yalnızca başlat ve durdur dokunur** — canlı sayaç, zincir üzerindeki `startedAt` değerinden istemci tarafında hesaplanır. Ücretlendirme `block.timestamp` kullanır; bu, birim zaten saniye olduğu için tam olarak faturalama birimidir, dolayısıyla aynı saniyeye düşen birkaç 300 ms'lik blok sorun yaratmaz.
 - **Native MON, onay (approval) yok** — başlatmak için bir işlem, durdurmak için bir işlem.
+
+<br/>
+
+---
+
+## 🎮 60 saniyede dene
+
+1. **[Canlı demoyu](https://saniye-monad-hackhathon-dh4x.vercel.app/)** aç. Tarayıcı cüzdanı otomatik oluşturulur.
+2. Sağ üstteki cüzdana dokun, adresi kopyala ve [faucet.monad.xyz](https://faucet.monad.xyz) ya da MetaMask'tan ~0,5 test MON gönder.
+3. **Başlat**'a bas: bariyer açılır, sayaç başlar. **Durdur**'a bas: sadece kullandığın saniyeleri ödersin, kalanı geri gelir.
+4. Tam akış için laptop'ta **İşletme → Kiosk ekranını aç**, QR'ı telefonla okut.
 
 <br/>
 
@@ -116,9 +131,12 @@ Kazançlar için pull-payment yöntemi, checks-effects-interactions sıralaması
 **Seçenek A — Node (Foundry gerekmez)**
 
 ```bash
+cd saniye
 npm install
-PRIVATE_KEY=0xYOUR_TESTNET_KEY npm run deploy
+npm run deploy        # isteğe bağlı: PRIVATE_KEY=0x... npm run deploy
 ```
+
+`PRIVATE_KEY` verilmezse script bir deploy cüzdanı oluşturur (git'e girmeyen `.deployer-key` dosyasına kaydeder), adresini yazdırır ve bu adrese MON göndermeni ister; komutu tekrar çalıştırınca deploy eder.
 
 Bu komut kontratı derler, Monad Testnet'e (chain id `10143`) deploy eder, demo hizmeti **"Kadıköy Otopark"**'ı `0,18 MON/saat` ücretle kaydeder ve adresi `frontend/config.js` dosyasına yazar.
 
@@ -169,7 +187,7 @@ Uygulama ilk açılışta bir tarayıcı cüzdanı oluşturur (yalnızca testnet
 
 - Her tamamlanan oturumda **%1 platform komisyonu** — zincir üstünde, `stop()` içinde.
 - **B2B:** otopark işletmeleri, scooter filoları, coworking alanları, oyun kafeleri, EV şarj noktaları.
-- **Sırada:** fiyatların sabit kalması için stablecoin depozito (örn. USDC), bariyerde NFC veya QR ile dokunup başlatma, ve kullanıcıların cüzdan hiç görmemesi için passkey ile giriş.
+- **Sırada:** fiyatların sabit kalması için stablecoin depozito (örn. USDC), bariyerde NFC ile dokunup başlatma, ve kullanıcıların cüzdan hiç görmemesi için passkey ile giriş.
 
 <br/>
 
