@@ -10,13 +10,14 @@ import {
 } from "https://esm.sh/viem@2.40.3";
 import { privateKeyToAccount, generatePrivateKey } from "https://esm.sh/viem@2.40.3/accounts";
 import qrcode from "https://esm.sh/qrcode-generator@1.4.4";
+import jsQR from "https://esm.sh/jsqr@1.4.0";
 import { ABI } from "./abi.js";
 import { CONFIG } from "./config.js";
 
 // ------------------------------------------------------------------ setup
 const $ = (id) => document.getElementById(id);
 const params = new URLSearchParams(location.search);
-const SERVICE_ID = BigInt(params.get("service") || CONFIG.serviceId);
+let SERVICE_ID = BigInt(params.get("service") || CONFIG.serviceId);
 const ADDR = CONFIG.contractAddress;
 const CONFIGURED = /^0x[0-9a-fA-F]{40}$/.test(ADDR) && !/^0x0{40}$/.test(ADDR);
 const ETH_MS = 12000;
@@ -199,7 +200,7 @@ async function loadSession() {
     const [, rate] = await read("services", [serviceId]);
     const blk = await pub.getBlock();
     state.clockOffset = Number(blk.timestamp) + 0.5 - Date.now() / 1000;
-    state.session = { startedAt: Number(startedAt), deposit, rate };
+    state.session = { serviceId, startedAt: Number(startedAt), deposit, rate };
   } else {
     state.session = null;
   }
@@ -212,6 +213,10 @@ function renderUser() {
   document.querySelector(".main-card").classList.toggle("live", live);
   const btn = $("actionBtn");
   btn.disabled = state.busy || !CONFIGURED || !state.service;
+  $("scanBtn").disabled = btn.disabled;
+  $("scanBtn").innerHTML = live
+    ? `<span aria-hidden="true">▣</span> Çıkış QR'ını okut <span class="muted">· öde ve kalan iade</span>`
+    : `<span aria-hidden="true">▣</span> QR okut <span class="muted">· girişte başlar, çıkışta öder</span>`;
   btn.className = "btn huge " + (live ? "stop" : "primary");
   btn.textContent = state.busy ? "Zincire gönderiliyor…" : live ? "Durdur ve öde" : `Başlat  ·  ${CONFIG.depositMon} MON depozito`;
   if (!live) {
@@ -292,7 +297,7 @@ async function doStart() {
   const [ev] = parseEventLogs({ abi: ABI, logs: receipt.logs, eventName: "SessionStarted" });
   const startedAt = Number(ev.args.startedAt);
   state.clockOffset = startedAt + 0.5 - Date.now() / 1000;
-  state.session = { startedAt, deposit: ev.args.deposit, rate: state.service.rate };
+  state.session = { serviceId: SERVICE_ID, startedAt, deposit: ev.args.deposit, rate: state.service.rate };
   showLatency(ms, sync);
   addFeed("rcptFeed", "başlat", `Blok #${receipt.block} · ${Math.round(ms)} ms`, receipt.hash);
   setStatus(`Bariyer açıldı · onay ${Math.round(ms)} ms`, "ok");
@@ -322,6 +327,92 @@ async function doStop() {
     </div>
     <p class="muted small">Tek işlemde: ücret işletmeye, %1 platform payı hazineye, kalan depozito sana. <a href="${txUrl(receipt.hash)}" target="_blank" rel="noopener">Explorer'da gör ↗</a></p>`;
   s.hidden = false;
+}
+
+// ------------------------------------------------------------------ in-app QR scanner
+// Scan at the entrance: session starts. Scan the same code at the exit: pay and get refunded.
+function serviceFromQR(text) {
+  const t = String(text || "").trim();
+  try {
+    const s = new URL(t).searchParams.get("service");
+    if (s && /^\d+$/.test(s)) return BigInt(s);
+  } catch {}
+  if (/^\d+$/.test(t)) return BigInt(t);
+  return null;
+}
+
+async function onScanResult(text) {
+  const id = serviceFromQR(text);
+  if (id === null) {
+    setStatus("Bu bir Saniye QR kodu değil.", "err");
+    return;
+  }
+  if (state.session) {
+    if (state.session.serviceId !== undefined && BigInt(state.session.serviceId) !== id) {
+      setStatus("Aktif oturumun başka bir hizmette. Önce onu durdur.", "err");
+      return;
+    }
+    setStatus("Çıkış QR'ı okundu. Ödeniyor…");
+    return onAction(); // stop + pay + refund
+  }
+  if (id !== SERVICE_ID) {
+    SERVICE_ID = id;
+    history.replaceState(null, "", `${location.pathname}?service=${id}#kullanici`);
+    await loadService();
+    renderUser();
+  }
+  setStatus("Giriş QR'ı okundu. Başlatılıyor…");
+  return onAction(); // start
+}
+
+let scanStream = null;
+let scanLoop = null;
+async function openScanner() {
+  if (!navigator.mediaDevices?.getUserMedia) {
+    setStatus("Bu tarayıcı kamerayı desteklemiyor. Telefonun kamera uygulamasıyla QR'ı okutabilirsin.", "err");
+    return;
+  }
+  $("scanner").hidden = false;
+  $("scanHint").textContent = "Kamerayı bariyerdeki / kasadaki Saniye QR koduna tut.";
+  try {
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" }, audio: false });
+  } catch {
+    closeScanner();
+    setStatus("Kamera izni verilmedi. Tarayıcı ayarlarından izin ver ya da telefon kamerasıyla okut.", "err");
+    return;
+  }
+  const video = $("scanVideo");
+  video.srcObject = scanStream;
+  await video.play().catch(() => {});
+  const canvas = document.createElement("canvas");
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
+  const step = () => {
+    if (!scanStream) return;
+    if (video.readyState >= 2 && video.videoWidth) {
+      const scale = Math.min(1, 640 / video.videoWidth);
+      canvas.width = Math.round(video.videoWidth * scale);
+      canvas.height = Math.round(video.videoHeight * scale);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const code = jsQR(img.data, img.width, img.height, { inversionAttempts: "dontInvert" });
+      if (code?.data && serviceFromQR(code.data) !== null) {
+        navigator.vibrate?.(60);
+        closeScanner();
+        onScanResult(code.data);
+        return;
+      }
+    }
+    scanLoop = requestAnimationFrame(step);
+  };
+  scanLoop = requestAnimationFrame(step);
+}
+function closeScanner() {
+  if (scanLoop) cancelAnimationFrame(scanLoop);
+  scanLoop = null;
+  scanStream?.getTracks().forEach((t) => t.stop());
+  scanStream = null;
+  $("scanVideo").srcObject = null;
+  $("scanner").hidden = true;
 }
 
 // ------------------------------------------------------------------ QR & kiosk
@@ -524,8 +615,15 @@ async function boot() {
   $("withdrawBtn").onclick = onWithdraw;
   $("regForm").onsubmit = onRegister;
   $("kioskBtn").onclick = openKiosk;
+  $("scanBtn").onclick = openScanner;
+  $("scanClose").onclick = closeScanner;
+  window.__saniye = { onScanResult }; // used by tests
   $("kioskClose").onclick = closeKiosk;
-  document.addEventListener("keydown", (e) => e.key === "Escape" && !$("kiosk").hidden && closeKiosk());
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape") return;
+    if (!$("scanner").hidden) closeScanner();
+    else if (!$("kiosk").hidden) closeKiosk();
+  });
   $("copyLink").onclick = () => navigator.clipboard.writeText(customerUrl());
   $("walletBtn").onclick = () => ($("walletPanel").hidden = false);
   $("walletClose").onclick = () => ($("walletPanel").hidden = true);

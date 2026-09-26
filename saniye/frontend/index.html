@@ -88,6 +88,9 @@
           <p class="muted small row between"><span>Depozito: <span class="mono" id="depositLbl">—</span></span><span>İade edilecek: <span class="mono" id="refundLbl">—</span></span></p>
 
           <button id="actionBtn" class="btn primary huge" disabled>Yükleniyor…</button>
+          <button id="scanBtn" class="btn ghost scan-btn" type="button">
+            <span aria-hidden="true">▣</span> QR okut <span class="muted">· girişte başlar, çıkışta öder</span>
+          </button>
           <p class="status" id="status" role="status"></p>
         </article>
 
@@ -176,6 +179,18 @@
     <span>Kontrat: <a id="contractLink" class="mono" target="_blank" rel="noopener">—</a></span>
     <span>Monad Blitz İstanbul · 2026</span>
   </footer>
+
+  <!-- in-app QR scanner -->
+  <div id="scanner" class="scanner" hidden>
+    <div class="scanner-card">
+      <div class="row between"><h3>QR okut</h3><button class="icon-btn" id="scanClose" aria-label="Kapat">✕</button></div>
+      <div class="scan-view">
+        <video id="scanVideo" playsinline muted></video>
+        <div class="scan-frame" aria-hidden="true"></div>
+      </div>
+      <p class="muted small" id="scanHint">Kamerayı bariyerdeki / kasadaki Saniye QR koduna tut.</p>
+    </div>
+  </div>
 
   <!-- kiosk: full-screen QR for the gate / counter -->
   <div id="kiosk" class="kiosk" hidden>

@@ -170,6 +170,18 @@ h2 { margin: 4px 0; font-size: 26px; letter-spacing: -0.02em; }
 .summary .sum-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
 .summary .sum-grid p { margin: 0; }
 
+/* ---------- in-app scanner ---------- */
+.scan-btn { width: 100%; margin-top: 10px; padding: 14px; font-size: 16px; }
+.scan-btn .muted { font-weight: 400; font-size: 14px; }
+.scanner { position: fixed; inset: 0; z-index: 40; background: rgba(0,0,0,.8); display: grid; place-items: center; padding: 16px; }
+.scanner[hidden] { display: none; }
+.scanner-card { width: min(440px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.scanner-card h3 { margin: 0; }
+.scan-view { position: relative; margin: 14px 0 10px; border-radius: 14px; overflow: hidden; background: #000; aspect-ratio: 1; }
+.scan-view video { width: 100%; height: 100%; object-fit: cover; display: block; }
+.scan-frame { position: absolute; inset: 14%; border: 3px solid var(--lime); border-radius: 16px; box-shadow: 0 0 0 999px rgba(0,0,0,.35); animation: pulse-frame 1.4s ease-in-out infinite; }
+@keyframes pulse-frame { 50% { inset: 16%; } }
+
 /* ---------- QR ---------- */
 .qr-card { display: grid; grid-template-columns: 220px 1fr; gap: 24px; align-items: center; margin-bottom: 18px; }
 .qr-box { background: #fff; border-radius: 16px; padding: 12px; aspect-ratio: 1; }

@@ -22,6 +22,8 @@ The business dashboard shows active sessions, revenue flowing in real time, and 
 
 **Scan-to-start QR.** Every service gets a QR code (and a full-screen kiosk mode for the gate or counter screen). A customer scans it with their phone, the app opens with a ready browser wallet, and one tap starts the session. The kiosk listens to the chain and shows "Bariyer açıldı" the moment the customer's start transaction lands, then "İyi yolculuklar" with the amount paid when they stop. No app install, no card, no ticket.
 
+**In-app scanner: scan in, scan out.** Customers can also open the camera inside the app: scanning the service QR at the entrance starts the session, scanning the same QR at the exit settles it and refunds the rest. Scanning a different service's QR switches to that service.
+
 ## Why this needs Monad
 
 | | Ethereum L1 | Monad |
