@@ -16,7 +16,7 @@
 [![Solidity](https://img.shields.io/badge/Solidity-Foundry-363636?style=for-the-badge&logo=solidity&logoColor=white)](#tests)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](#)
 
-**[🔴 Live Demo](<VERCEL_URL>)** &nbsp;|&nbsp; **[📜 Contract on Monad Testnet](https://testnet.monadvision.com/address/0xBDc9bF66b1d850B555E38F922615a6703014Cce6)**
+**[🔴 Live Demo](https://saniye-monad-hackhathon-dh4x.vercel.app/)** &nbsp;|&nbsp; **[📜 Contract on Monad Testnet](https://testnet.monadvision.com/address/0xBDc9bF66b1d850B555E38F922615a6703014Cce6)**
 
 </div>
 
