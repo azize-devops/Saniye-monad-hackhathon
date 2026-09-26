@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Saniye · Kullandığın saniye kadar öde</title>
+  <meta name="description" content="Monad üzerinde saniye başı ödeme: otopark, scooter, PlayStation kafe. Durdurduğun an kalan para iade." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23836EF9'/%3E%3Ccircle cx='16' cy='16' r='8' fill='none' stroke='%23D8FF3E' stroke-width='3'/%3E%3Cpath d='M16 10v6l4 2' stroke='%23D8FF3E' stroke-width='2.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#kullanici">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">saniye<span class="dot">.</span></span>
+    </a>
+    <nav class="tabs" role="tablist">
+      <a href="#kullanici" class="tab" data-tab="user">Kullanıcı</a>
+      <a href="#isletme" class="tab" data-tab="biz">İşletme</a>
+    </nav>
+    <div class="top-right">
+      <span class="net-pill" title="Monad Testnet"><i class="pulse"></i>Monad Testnet · <span id="blockNo" class="mono">#—</span></span>
+      <button id="walletBtn" class="wallet-chip">Cüzdan…</button>
+    </div>
+  </header>
+
+  <!-- wallet drawer -->
+  <div id="walletPanel" class="drawer" hidden>
+    <div class="drawer-card">
+      <div class="row between"><h3>Cüzdan</h3><button class="icon-btn" id="walletClose" aria-label="Kapat">✕</button></div>
+      <p class="muted small" id="walletMode"></p>
+      <div class="addr-box mono" id="walletAddr">—</div>
+      <div class="row gap">
+        <button class="btn ghost small-btn" id="copyAddr">Adresi kopyala</button>
+        <span class="mono" id="walletBal">— MON</span>
+      </div>
+      <p class="muted small">Test MON al: <span id="faucetLinks"></span></p>
+      <hr />
+      <div class="row gap wrap">
+        <button class="btn ghost small-btn" id="useBurner">Tarayıcı cüzdanı (tek tık)</button>
+        <button class="btn ghost small-btn" id="useInjected">MetaMask / tarayıcı eklentisi</button>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <!-- ============ USER VIEW ============ -->
+    <section id="view-user" class="view">
+      <div class="hero">
+        <p class="eyebrow">Monad üzerinde saniye başı ödeme</p>
+        <h1>Kullandığın <em>saniye</em> kadar öde.</h1>
+        <p class="lede">61 dakika park edene 2 saat yazılmaz. Başlat, kullan, durdur: kalan para aynı saniye cüzdanına döner.</p>
+      </div>
+
+      <div class="grid">
+        <article class="card main-card">
+          <div class="row between">
+            <div>
+              <p class="label">Hizmet</p>
+              <h2 id="svcName">—</h2>
+              <p class="muted mono small" id="svcRate">—</p>
+            </div>
+            <div class="gate" id="gate" aria-hidden="true">
+              <div class="gate-post"></div>
+              <div class="gate-arm"></div>
+              <div class="gate-light"></div>
+            </div>
+          </div>
+
+          <div class="counter">
+            <div>
+              <p class="label">Süre</p>
+              <p class="big mono" id="elapsed">00:00:00</p>
+            </div>
+            <div>
+              <p class="label">Ödenen</p>
+              <p class="big mono accent" id="cost">0.000000</p>
+              <p class="muted small mono">MON</p>
+            </div>
+          </div>
+
+          <div class="meter" aria-label="Depozito">
+            <div class="meter-fill" id="meterFill"></div>
+          </div>
+          <p class="muted small row between"><span>Depozito: <span class="mono" id="depositLbl">—</span></span><span>İade edilecek: <span class="mono" id="refundLbl">—</span></span></p>
+
+          <button id="actionBtn" class="btn primary huge" disabled>Yükleniyor…</button>
+          <p class="status" id="status" role="status"></p>
+        </article>
+
+        <aside class="side">
+          <article class="card">
+            <p class="label">Onay süresi</p>
+            <div class="latency">
+              <div class="lat-row"><span>Monad</span><div class="lat-bar"><i id="latMonadBar" style="width:0%"></i></div><span class="mono" id="latMonad">— ms</span></div>
+              <div class="lat-row"><span>Ethereum</span><div class="lat-bar eth"><i style="width:100%"></i></div><span class="mono">~12.000 ms</span></div>
+            </div>
+            <p class="muted small" id="latNote">İşlem gönderildikten makbuz gelene kadar ölçülür.</p>
+          </article>
+
+          <article class="card">
+            <p class="label">Klasik sistem ile karşılaştır</p>
+            <div class="compare">
+              <div><p class="muted small">Saatlik yuvarlama</p><p class="mono mid" id="classic">—</p></div>
+              <div><p class="muted small">Saniye</p><p class="mono mid accent" id="fair">—</p></div>
+            </div>
+            <p class="saving" id="saving">Başlattığında fark burada görünür.</p>
+          </article>
+
+          <article class="card">
+            <p class="label">Zincir makbuzları</p>
+            <ol class="feed" id="rcptFeed"><li class="muted small">Henüz işlem yok.</li></ol>
+          </article>
+        </aside>
+      </div>
+
+      <div id="summary" class="card summary" hidden></div>
+    </section>
+
+    <!-- ============ BUSINESS VIEW ============ -->
+    <section id="view-biz" class="view" hidden>
+      <div class="hero">
+        <p class="eyebrow">İşletme paneli</p>
+        <h1 id="bizTitle">—</h1>
+        <p class="lede">Aktif oturumlar ve gelir, her yeni blokla güncellenir. Kazancını istediğin an çek.</p>
+      </div>
+
+      <div class="kpis">
+        <div class="card kpi"><p class="label">Aktif oturum</p><p class="big mono" id="bizActive">0</p></div>
+        <div class="card kpi"><p class="label">Şu an akan gelir</p><p class="big mono accent" id="bizLive">0.000000</p><p class="muted small mono">MON</p></div>
+        <div class="card kpi"><p class="label">Çekilebilir kazanç</p><p class="big mono" id="bizEarn">0.000000</p>
+          <button class="btn ghost small-btn" id="withdrawBtn" disabled>Kazancı çek</button></div>
+      </div>
+
+      <article class="card qr-card">
+        <div class="qr-box" id="qrBox" aria-label="Müşteri QR kodu"></div>
+        <div class="qr-text">
+          <p class="label">Okut ve başlat</p>
+          <h2>Müşteri QR'ı</h2>
+          <p class="muted">Bu kodu bariyere, masaya veya şarj istasyonuna as. Müşteri telefonla okutur, tek dokunuşla başlar. Uygulama indirme, kart, fiş yok.</p>
+          <p class="muted small mono qr-link" id="qrLink">—</p>
+          <div class="row gap wrap">
+            <button class="btn primary" id="kioskBtn">Kiosk ekranını aç</button>
+            <button class="btn ghost" id="copyLink">Linki kopyala</button>
+          </div>
+        </div>
+      </article>
+
+      <div class="grid">
+        <article class="card">
+          <p class="label">Aktif oturumlar</p>
+          <ul class="sessions" id="bizSessions"><li class="muted small">Şu an aktif oturum yok.</li></ul>
+        </article>
+        <article class="card">
+          <p class="label">Canlı akış</p>
+          <ol class="feed" id="bizFeed"><li class="muted small">Olaylar burada anlık akar.</li></ol>
+        </article>
+      </div>
+
+      <details class="card register">
+        <summary>Kendi hizmetini ekle</summary>
+        <form id="regForm" class="reg-form">
+          <label>Hizmet adı <input name="name" value="Moda PlayStation Kafe" required maxlength="40" /></label>
+          <label>Saatlik ücret (MON) <input name="perHour" value="0.36" inputmode="decimal" required /></label>
+          <button class="btn primary" type="submit">Hizmeti zincire kaydet</button>
+          <p class="muted small" id="regStatus"></p>
+        </form>
+      </details>
+    </section>
+  </main>
+
+  <footer class="foot muted small">
+    <span>Kontrat: <a id="contractLink" class="mono" target="_blank" rel="noopener">—</a></span>
+    <span>Monad Blitz İstanbul · 2026</span>
+  </footer>
+
+  <!-- kiosk: full-screen QR for the gate / counter -->
+  <div id="kiosk" class="kiosk" hidden>
+    <button class="icon-btn kiosk-close" id="kioskClose" aria-label="Kiosk ekranını kapat">✕</button>
+    <div class="kiosk-inner">
+      <p class="eyebrow">saniye. · Monad</p>
+      <h1 id="kioskName">—</h1>
+      <p class="kiosk-price mono" id="kioskPrice">—</p>
+      <div class="kiosk-qr" id="kioskQr"></div>
+      <p class="kiosk-hint">Telefonunla okut · Başlat'a dokun · Geç</p>
+      <p class="muted small">Kullandığın saniye kadar ödersin, kalan anında iade.</p>
+    </div>
+    <div class="kiosk-flash" id="kioskFlash" hidden>
+      <div class="gate open big-gate" aria-hidden="true"><div class="gate-post"></div><div class="gate-arm"></div><div class="gate-light"></div></div>
+      <p class="kiosk-flash-title" id="kioskFlashTitle">Bariyer açıldı</p>
+      <p class="mono muted" id="kioskFlashSub">—</p>
+    </div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

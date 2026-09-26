@@ -1,0 +1,15 @@
+{
+  "name": "saniye",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Saniye: pay-per-second for real-world services on Monad",
+  "scripts": {
+    "deploy": "node scripts/deploy.mjs",
+    "dev": "npx --yes serve frontend -l 5173"
+  },
+  "dependencies": {
+    "solc": "0.8.28",
+    "viem": "^2.40.0"
+  }
+}
